@@ -1,0 +1,27 @@
+body {
+	padding: 0;
+    margin: 0;
+}
+
+iframe {
+	width: 500px;
+	height: 500px;
+}
+
+#drop {
+	width: 100vw;
+	height: 100vh;
+	background: #eee;
+	display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#drop p {
+	text-align: center;
+}
+
+#drop.dropzone {
+	transition: all 1s;
+	background: green;
+}

@@ -1,11 +1,14 @@
-<head>
-	<title>megablocks</title>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.0.1/min/dropzone.min.css">
-</head>
-<body>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.0.1/min/dropzone.min.js'></script>
-<form action="/file-upload"
-      class="dropzone"
-      id="my-awesome-dropzone"></form>
+{% extends 'base.html' %}
 
-</body>
+{% block content %}
+<div id="drop">
+	<div>
+		<p>drop files here</p>
+		<p><a href="">huh?</a></p>
+	</div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ url_for('static', filename='drag.js') }}"></script>
+{% endblock %}
