@@ -19,23 +19,24 @@ def index():
 
 @app.route('/file-upload', methods=['POST'])
 def upload():
-	print 'hi'
-	file = request.files['file']
-	print file
-	print file.content_type
-	filename = secure_filename(file.filename)
-	print filename
-	oid = fs.put(file, content_type=file.content_type, filename=filename)
 
 	block = {}
 	filez = []
+	block['files'] = filez
+	block_id = blocks.insert_one(block).inserted_id
+
+	file = request.files['file']
+
+	filename = str(block_id) + '/' + secure_filename(file.filename)
+
+	oid = fs.put(file, content_type=file.content_type, filename=filename)
+
 	filez.append({
 		'name': filename,
 		'id': oid
 	})
-	block['files'] = filez
-	block_id = blocks.insert_one(block).inserted_id
 
+	blocks.update({'_id':block_id}, {'files': filez})
 	return redirect(url_for('view_block', id=block_id))
 
 
@@ -46,8 +47,7 @@ def view_block(id):
 
 @app.route('/<id>/<filename>')
 def view_file(id, filename):
-	block = blocks.find_one({'_id': id})
-	file = fs.get(block['files'][filename])
+	file = fs.find_one({'filename': id + '/' + filename})
 	response = make_response(file.read())
 	response.mimetype = file.content_type
 	return response
