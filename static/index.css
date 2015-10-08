@@ -6,12 +6,19 @@
     align-items: center;
     justify-content: center;
     transition: all 2s;
+    position: relative;
+    background: radial-gradient(ellipse at center, rgba(221,255,216,1) 0%,rgba(173,255,107,1) 100%);
+    z-index: 1;
 }
 
 #drop:before {
 	width: 100vw;
 	height: 66vh;
-	background: radial-gradient(ellipse at center, rgba(221,255,216,1) 0%,rgba(173,255,107,1) 100%);
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	transition: all 2s;
 	background: radial-gradient(ellipse at center, rgba(234,234,234,1) 0%,rgba(224,224,224,1) 100%);
 	opacity: 1;
 }
@@ -20,10 +27,13 @@
 	text-align: center;
 }
 
-#drop.dropzone {
-	
+#drop.dropzone:before {
+	opacity: 0;
 }
 
+#drop div {
+	z-index: 10;
+}
 
 #blocks {
 	max-width: 980px;

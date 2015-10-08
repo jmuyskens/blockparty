@@ -1,6 +1,8 @@
 from collections import defaultdict
 import markdown
 import datetime
+import os
+
 from flask import Flask, request, render_template, make_response, url_for, redirect, jsonify
 from bson.objectid import ObjectId
 from werkzeug import secure_filename
@@ -9,8 +11,16 @@ from gridfs import GridFS
 import jinja2_highlight
 import jinja2
 
-client = MongoClient('mongodb://localhost:27017/')
-db = client.test_database
+MONGODB_SETTINGS = {
+    'db': os.getenv('MONGODB_DB', 'blockparty_dev'),
+    'host': os.getenv('MONGODB_HOST', 'localhost'),
+    'port': os.getenv('MONGODB_PORT', 27017),
+    'username': os.getenv('MONGODB_USER', 'host'),
+    'password': os.getenv('MONGODB_PASS', 'local') 
+}
+
+client = MongoClient(host=MONGODB_SETTINGS['host'], port=MONGODB_SETTINGS['port'])
+db = client[MONGODB_SETTINGS['db']].authenticate(MONGODB_SETTINGS['username'], MONGODB_SETTINGS['password'], mechanism='SCRAM-SHA-1')
 fs = GridFS(db)
 
 blocks = db.blocks
@@ -29,7 +39,7 @@ def render_markdown(text):
 
 @app.route('/', methods=['GET'])
 def index():
-	recent_blocks = list(blocks.find(sort=[('timestamp', 1)], limit=20))
+	recent_blocks = list(blocks.find(sort=[('timestamp', -1)], limit=20))
 	return render_template('index.html', blocks=recent_blocks)
 
 
