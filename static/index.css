@@ -1,0 +1,46 @@
+#drop {
+	width: 100vw;
+	height: 66vh;
+	
+	display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 2s;
+}
+
+#drop:before {
+	width: 100vw;
+	height: 66vh;
+	background: radial-gradient(ellipse at center, rgba(221,255,216,1) 0%,rgba(173,255,107,1) 100%);
+	background: radial-gradient(ellipse at center, rgba(234,234,234,1) 0%,rgba(224,224,224,1) 100%);
+	opacity: 1;
+}
+
+#drop p {
+	text-align: center;
+}
+
+#drop.dropzone {
+	
+}
+
+
+#blocks {
+	max-width: 980px;
+	margin: 0 auto;
+}
+
+.block {
+	width: 18%;
+	float: left;
+	height: 100px;
+	padding: 1rem;
+	border: 1px solid #eee;
+	margin: 1rem;
+	border-radius: 5px;
+	font-size: 12px;
+}
+
+.block img {
+	width: 100%;
+}

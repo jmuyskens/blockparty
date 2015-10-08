@@ -1,11 +1,23 @@
 {% extends 'base.html' %}
 
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+{% endblock %}
+
 {% block content %}
 <div id="drop">
 	<div>
 		<p>drop files here</p>
 		<p><a href="">huh?</a></p>
 	</div>
+</div>
+<div id="blocks">
+	{% for block in blocks %}
+	<a href="{{ block._id }}"><div class="block">
+		{{ block._id }}
+		{% if block.thumbnail %}<img src="{{ block._id }}/{{ block.thumbnail }}" alt="">{% endif %}
+	</div></a>
+	{% endfor %}
 </div>
 {% endblock %}
 

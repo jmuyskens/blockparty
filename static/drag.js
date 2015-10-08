@@ -43,7 +43,7 @@ dataTextArea.addEventListener("drop", function( event ) {
   event.preventDefault();
   // move dragged elem to the selected drop target
   if ( event.target.className == "dropzone" ) {
-      event.target.style.background = "";
+    event.target.style.background = "";
   }
 
   var dt = event.dataTransfer;
@@ -74,6 +74,4 @@ dataTextArea.addEventListener("drop", function( event ) {
   });
 
   createAjax.send();
-
-
 }, false);

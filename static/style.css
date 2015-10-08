@@ -1,27 +1,41 @@
 body {
+	font-family: sans-serif;
+}
+
+a {
+	text-decoration: none;
+}
+
+a.delete {
+	color: #aaa;
+}
+
+body {
 	padding: 0;
     margin: 0;
 }
 
 iframe {
-	width: 500px;
-	height: 500px;
+	border: none;
+	width: 980px;
+	height: 510px;
 }
 
-#drop {
-	width: 100vw;
-	height: 100vh;
-	background: #eee;
-	display: flex;
-    align-items: center;
-    justify-content: center;
+#files {
+	max-width: 980px;
+	margin: 0 auto;
 }
 
-#drop p {
-	text-align: center;
+.file {
+	padding-bottom: 2rem;
+	margin-bottom: 2rem;
+	border-bottom: 1px solid #eee;
 }
 
-#drop.dropzone {
-	transition: all 1s;
-	background: green;
+.file:last-child {
+	border-bottom: none;
+}
+
+.right {
+	float: right;
 }

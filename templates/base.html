@@ -2,6 +2,7 @@
 <head>
 	<title>block. party.</title>
 	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+	{% block css %}{% endblock %}
 </head>
 <body>
 	{% block content %}{% endblock %}
