@@ -13,3 +13,12 @@
 	border-bottom: 1px solid #eee;
 	padding-bottom: 1rem;
 }
+
+.file .CodeMirror {
+	height: auto;
+}
+
+.file .CodeMirror-gutters {
+	border: none;
+	background: none;
+}

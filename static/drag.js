@@ -65,7 +65,7 @@ dataTextArea.addEventListener("drop", function( event ) {
   createAjax.addEventListener('load', function(e) {
   	id = JSON.parse(createAjax.responseText).id;
 
-  	uploadAjax.open('POST', id + '/upload', true);
+  	uploadAjax.open('POST', 'block/' + id, true);
   	uploadAjax.send(fd);
   });
 

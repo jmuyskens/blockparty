@@ -13,9 +13,9 @@
 </div>
 <div id="blocks">
 	{% for block in blocks %}
-	<a href="{{ block._id }}"><div class="block">
-		{{ block._id }}
-		{% if block.thumbnail %}<img src="{{ block._id }}/{{ block.thumbnail }}" alt="">{% endif %}
+	<a href="block/{{ block._id }}"><div class="block">
+		<h4>{% if block.title %}{{ block.title }}{% else %}{{ block._id }}{% endif %}</h4>
+		{% if block.thumbnail %}<img src="block/{{ block._id }}/{{ block.thumbnail }}" alt="">{% endif %}
 	</div></a>
 	{% endfor %}
 </div>

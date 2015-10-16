@@ -1,7 +1,11 @@
+h4 {
+	margin: 0 0 0.5rem 0;
+}
+
 #drop {
 	width: 100vw;
 	height: 66vh;
-	
+
 	display: flex;
     align-items: center;
     justify-content: center;
@@ -43,7 +47,7 @@
 .block {
 	width: 18%;
 	float: left;
-	height: 100px;
+	height: 110px;
 	padding: 1rem;
 	border: 1px solid #eee;
 	margin: 1rem;

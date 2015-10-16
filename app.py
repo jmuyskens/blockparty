@@ -2,36 +2,36 @@ from collections import defaultdict
 import markdown
 import datetime
 import os
+import io
+import zipfile
 
 from flask import Flask, request, render_template, make_response, url_for, redirect, jsonify
 from bson.objectid import ObjectId
 from werkzeug import secure_filename
 from pymongo import MongoClient
 from gridfs import GridFS
-import jinja2_highlight
+from bs4 import BeautifulSoup
 import jinja2
 
 MONGODB_SETTINGS = {
     'db': os.getenv('MONGODB_DB', 'blockparty_dev'),
     'host': os.getenv('MONGODB_HOST', 'localhost'),
     'port': os.getenv('MONGODB_PORT', 27017),
-    'username': os.getenv('MONGODB_USER', 'host'),
-    'password': os.getenv('MONGODB_PASS', 'local') 
+    'username': os.getenv('MONGODB_USER', 'blockparty_admin'),
+    'password': os.getenv('MONGODB_PASS', 'admin')
 }
 
 client = MongoClient(host=MONGODB_SETTINGS['host'], port=MONGODB_SETTINGS['port'])
-db = client[MONGODB_SETTINGS['db']].authenticate(MONGODB_SETTINGS['username'], MONGODB_SETTINGS['password'], mechanism='SCRAM-SHA-1')
+db = client[MONGODB_SETTINGS['db']]
+db.authenticate(
+	MONGODB_SETTINGS['username'],
+	MONGODB_SETTINGS['password'])
+
 fs = GridFS(db)
 
 blocks = db.blocks
 
-# extend flask to use our jinja2 extensions
-class MyFlask(Flask):
-    jinja_options = dict(Flask.jinja_options)
-    jinja_options.setdefault('extensions',
-        []).append('jinja2_highlight.HighlightExtension')
-
-app = MyFlask(__name__)
+app = Flask(__name__)
 
 @app.template_filter('markdown')
 def render_markdown(text):
@@ -53,11 +53,10 @@ def create():
 	return jsonify(**{'id': str(block_id)})
 
 
-@app.route('/<id>/upload', methods=['POST'])
 def upload(id):
 	files = request.files.getlist('file')
 	block = blocks.find_one({'_id': ObjectId(id)})
-	
+	title = ''
 	file_storage = []
 	if block:
 		file_storage = block['files']
@@ -81,10 +80,13 @@ def upload(id):
 		if file.content_type in content_types:
 			content = file.read()
 
+			if 'index.html' in filename:
+				title = BeautifulSoup(content).title.string
+
 		print content
 
 		programming_languages = defaultdict(str)
-		
+
 		for lang in [('text/css', 'css'), ('text/html', 'html'), ('text/javascript', 'javascript')]:
 			programming_languages[lang[0]] = lang[1]
 
@@ -97,13 +99,22 @@ def upload(id):
 			'programming_language': programming_languages[file.content_type]
 		})
 
-	blocks.find_one_and_update({'_id': ObjectId(id)}, {'$set': {'files': file_storage, 'thumbnail': thumbnail}}, upsert=True)
+	update = {'files': file_storage, 'thumbnail': thumbnail}
+
+	if title:
+		update['title'] = title
+
+	blocks.find_one_and_update({'_id': ObjectId(id)}, {'$set': update}, upsert=True)
 
 	return jsonify(**{'num': len(file_storage)})
 
 
-@app.route('/<id>')
+@app.route('/block/<id>', methods=['GET', 'POST'])
 def view_block(id):
+
+	if (request.method == 'POST'):
+		return upload(id)
+
 	block = blocks.find_one({'_id': ObjectId(id)})
 	filenames = []
 
@@ -128,7 +139,7 @@ def view_block(id):
 	return render_template('block.html', block=block, files=block['files'], index=index, readme=readme)
 
 
-@app.route('/<id>/<filename>', methods=['GET', 'DELETE', 'POST'])
+@app.route('/block/<id>/<filename>', methods=['GET', 'DELETE', 'POST'])
 def view_file(id, filename):
 	block = blocks.find_one({'_id': ObjectId(id)})
 	path = id + '/' + filename
@@ -149,14 +160,36 @@ def view_file(id, filename):
 			blocks.find_one_and_update({'_id': ObjectId(id)}, {'$set': {'files': block['files']}}, upsert=True)
 
 	elif request.method == 'POST':
-		print 'hi post'
 		file = fs.find_one({'filename': id + '/' + filename})
 		content = request.form['content']
 		oid = fs.put(content, encoding='utf-8', content_type=file.content_type, filename=path)
 		block['files'][filenames.index(filename)]['content'] = content
 		block['files'][filenames.index(filename)]['id'] = str(oid)
-		blocks.find_one_and_update({'_id': ObjectId(id)}, {'$set': {'files': block['files']}}, upsert=True)
+		update = {'files': block['files']}
+		if 'index.html' in filename:
+			title = BeautifulSoup(content).title.string
+			update['title'] = title
+		blocks.find_one_and_update({'_id': ObjectId(id)}, {'$set': update}, upsert=True)
 		return redirect(url_for('view_block', id=id), 302)
+
+
+@app.route('/download/<id>')
+def download(id):
+	block = blocks.find_one({'_id': ObjectId(id)})
+	files = block['files']
+	zip_contents = ''
+	zipfilename = str(block['_id']) + '.zip'
+	with io.BytesIO() as stream:
+		with zipfile.ZipFile(stream, 'a', zipfile.ZIP_DEFLATED, False) as zip:
+			for file in files:
+				gridfile = fs.find_one({'filename': id + '/' + file['name']})
+				zip.writestr(file['name'], gridfile.read())
+		zip_contents = stream.getvalue()
+
+	response = make_response(zip_contents)
+	response.mimetype = 'application/zip'
+	return response
+
 
 if __name__ == "__main__":
 	app.run(debug=True)

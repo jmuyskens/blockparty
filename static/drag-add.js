@@ -56,8 +56,8 @@ dataTextArea.addEventListener("drop", function( event ) {
   }
 
   var uploadAjax = new XMLHttpRequest();
-  
-	uploadAjax.open('POST', document.location + '/upload', true);
+
+	uploadAjax.open('POST', document.location, true);
 	uploadAjax.send(fd);
 
   uploadAjax.addEventListener('load', function(e) {
