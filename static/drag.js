@@ -70,7 +70,7 @@ dataTextArea.addEventListener("drop", function( event ) {
   });
 
   uploadAjax.addEventListener('load', function(e) {
-  	window.location.href += id;
+  	window.location.href += 'block/' + id;
   });
 
   createAjax.send();
